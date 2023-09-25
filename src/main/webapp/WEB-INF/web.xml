@@ -6,7 +6,7 @@
 
     <servlet>
         <servlet-name>Pessoa</servlet-name>
-        <servlet-class>com.example.rinhabackend.servelet.PessoaServelet</servlet-class>
+        <servlet-class>com.example.rinhabackend.servlet.PessoaServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>Pessoa</servlet-name>

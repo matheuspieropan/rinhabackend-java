@@ -1,4 +1,4 @@
-package com.example.rinhabackend.servelet;
+package com.example.rinhabackend.servlet;
 
 import com.example.rinhabackend.util.ResponseHttpUtil;
 import com.example.rinhabackend.entity.Pessoa;
@@ -13,7 +13,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 
 @WebServlet
-public class PessoaServelet extends HttpServlet {
+public class PessoaServlet extends HttpServlet {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
