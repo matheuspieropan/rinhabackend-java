@@ -1,5 +1,6 @@
-package com.example.rinhabackend;
+package com.example.rinhabackend.servelet;
 
+import com.example.rinhabackend.util.ResponseHttpUtil;
 import com.example.rinhabackend.entity.Pessoa;
 import com.example.rinhabackend.repository.CrudRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,10 +34,10 @@ public class PessoaServelet extends HttpServlet {
             Pessoa pessoa = objectMapper.readValue(json.toString(), Pessoa.class);
             repository.salvar(pessoa);
 
-            ResponseHttp.createdSucess(response);
+            ResponseHttpUtil.createdSucess(response);
 
         } catch (IOException ex) {
-            ResponseHttp.failed(response);
+            ResponseHttpUtil.failed(response);
         }
     }
 }

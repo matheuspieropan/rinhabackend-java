@@ -5,11 +5,11 @@
          version="5.0">
 
     <servlet>
-        <servlet-name>Hello</servlet-name>
-        <servlet-class>com.example.rinhabackend.PessoaServelet</servlet-class>
+        <servlet-name>Pessoa</servlet-name>
+        <servlet-class>com.example.rinhabackend.servelet.PessoaServelet</servlet-class>
     </servlet>
     <servlet-mapping>
-        <servlet-name>Hello</servlet-name>
-        <url-pattern>/hello</url-pattern>
+        <servlet-name>Pessoa</servlet-name>
+        <url-pattern>/pessoas</url-pattern>
     </servlet-mapping>
 </web-app>
