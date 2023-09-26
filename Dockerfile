@@ -1,6 +1,6 @@
 FROM tomcat:10.1.13-jdk11
 
-COPY ROOT.war /usr/local/tomcat/webapps/
+COPY target/rinhabackend-1.0.war /usr/local/tomcat/webapps/ROOT.war
 
 EXPOSE 8080
 
