@@ -1,8 +1,8 @@
 package com.example.rinhabackend.servlet;
 
-import com.example.rinhabackend.util.ResponseHttpUtil;
 import com.example.rinhabackend.entity.Pessoa;
 import com.example.rinhabackend.repository.CrudRepository;
+import com.example.rinhabackend.util.ResponseHttpUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -21,8 +21,7 @@ public class PessoaServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) {
-        try {
-            BufferedReader bufferedReader = request.getReader();
+        try (BufferedReader bufferedReader = request.getReader()) {
 
             StringBuilder json = new StringBuilder();
             String line;
@@ -35,7 +34,6 @@ public class PessoaServlet extends HttpServlet {
             repository.salvar(pessoa);
 
             ResponseHttpUtil.createdSucess(response);
-
         } catch (IOException ex) {
             ResponseHttpUtil.failed(response);
         }

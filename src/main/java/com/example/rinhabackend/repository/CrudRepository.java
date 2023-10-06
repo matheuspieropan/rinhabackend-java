@@ -8,10 +8,16 @@ public class CrudRepository<T> {
     private final EntityManager entityManager = PersistenceFactory.getInstance();
 
     public void salvar(T entity) {
-        entityManager.getTransaction().begin();
+        try {
+            entityManager.getTransaction().begin();
 
-        entityManager.persist(entity);
+            entityManager.persist(entity);
 
-        entityManager.getTransaction().commit();
+            entityManager.getTransaction().commit();
+        } catch (Exception ex) {
+            if (entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().rollback();
+            }
+        }
     }
 }
