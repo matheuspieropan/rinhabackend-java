@@ -10,8 +10,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.25'
-          memory: '0.5GB'
+          cpus: '0.65'
+          memory: '0.75GB'
 
   api2:
     image: rinha
@@ -23,8 +23,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.25'
-          memory: '0.5GB'
+          cpus: '0.65'
+          memory: '0.75GB'
 
   nginx: # Load Balancer
     image: nginx:latest
@@ -38,12 +38,14 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.25'
+          cpus: '0.10'
           memory: '0.5GB'
 
   db: # Banco de dados
     image: postgres
-    command: "postgres -c max_connections=200 -c shared_buffers=256MB -c synchronous_commit=off -c fsync=off -c full_page_writes=off"
+    command: "postgres -c max_connections=200"
+    ports:
+      - "5433:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 123
@@ -51,5 +53,5 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.75'
-          memory: '1.5GB'
+          cpus: '0.20'
+          memory: '0.5GB'
