@@ -10,6 +10,7 @@ import com.example.rinhabackend.service.strategy.impl.DebitoNaoPodeSerMenorLimit
 import com.example.rinhabackend.service.strategy.impl.DescricaoCaracterMinMaxRequest;
 import com.example.rinhabackend.service.strategy.impl.TipoValidoRequest;
 import com.example.rinhabackend.service.strategy.impl.ValorPositivoRequest;
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -34,6 +35,7 @@ public class ClienteServlet extends HttpServlet {
     public ClienteServlet() {
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        //objectMapper.configure(JsonParser.Feature.INCLUDE_SOURCE_IN_LOCATION, true);
     }
 
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -60,7 +62,7 @@ public class ClienteServlet extends HttpServlet {
             response.setContentType("application/json");
         } catch (ValidacaoRequestException ex) {
             response.setStatus(ex.getStatusCode());
-        } catch (RuntimeException | IOException ex) {
+        } catch (IOException ex) {
             response.setStatus(SC_BAD_REQUEST);
         }
     }
@@ -93,7 +95,7 @@ public class ClienteServlet extends HttpServlet {
             }
         } catch (ValidacaoRequestException ex) {
             response.setStatus(ex.getStatusCode());
-        } catch (RuntimeException | IOException ex) {
+        } catch (IOException ex) {
             response.setStatus(SC_BAD_REQUEST);
         }
     }

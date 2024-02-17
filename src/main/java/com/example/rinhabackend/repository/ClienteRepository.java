@@ -15,11 +15,9 @@ public class ClienteRepository {
 
     public Cliente findById(Long id) {
         Cliente cliente = null;
-        Connection connection = DatabaseConnection.getConnection();
 
-        PreparedStatement prepareStatement;
-        try {
-            prepareStatement = connection.prepareStatement(findByIdCliente);
+        try (Connection connection = DatabaseConnection.getDataSource().getConnection()) {
+            PreparedStatement prepareStatement = connection.prepareStatement(findByIdCliente);
             prepareStatement.setLong(1, id);
 
             try (ResultSet rs = prepareStatement.executeQuery()) {
@@ -30,20 +28,15 @@ public class ClienteRepository {
                     cliente.setSaldo(rs.getInt("saldo"));
                 }
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
+        } catch (SQLException ex) {
+            ex.printStackTrace();
         }
-
         return cliente;
     }
 
     public void atualizaSaldo(int novoSaldo, Long id) {
-        Connection connection = DatabaseConnection.getConnection();
-        PreparedStatement prepareStatement;
-
-        try {
-            prepareStatement = connection.prepareStatement(updateSaldoCliente);
+        try (Connection connection = DatabaseConnection.getDataSource().getConnection()) {
+            PreparedStatement prepareStatement = connection.prepareStatement(updateSaldoCliente);
 
             prepareStatement.setInt(1, novoSaldo);
             prepareStatement.setLong(2, id);

@@ -16,11 +16,9 @@ import static com.example.rinhabackend.constante.SqlConstante.saveTransacao;
 public class TransacaoRepository {
 
     public void save(Transacao transacao) {
-        Connection connection = DatabaseConnection.getConnection();
-        PreparedStatement prepareStatement;
+        try (Connection connection = DatabaseConnection.getDataSource().getConnection()) {
 
-        try {
-            prepareStatement = connection.prepareStatement(saveTransacao);
+            PreparedStatement prepareStatement = connection.prepareStatement(saveTransacao);
 
             prepareStatement.setInt(1, transacao.getValor());
             prepareStatement.setObject(2, transacao.getTipo());
@@ -35,15 +33,14 @@ public class TransacaoRepository {
     }
 
     public ExtratoResponse findAll(Long idCliente) {
-        Connection connection = DatabaseConnection.getConnection();
         PreparedStatement prepareStatement;
 
         ExtratoResponse extratoResponse = new ExtratoResponse();
         List<Transacao> transacoes = new ArrayList<>();
 
-        try {
-            prepareStatement = connection.prepareStatement(extratoFindByIdCliente);
+        try (Connection connection = DatabaseConnection.getDataSource().getConnection()) {
 
+            prepareStatement = connection.prepareStatement(extratoFindByIdCliente);
             prepareStatement.setLong(1, idCliente);
 
             try (ResultSet rs = prepareStatement.executeQuery()) {
@@ -77,6 +74,7 @@ public class TransacaoRepository {
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
+
         extratoResponse.setTransacoes(transacoes);
         return extratoResponse;
     }

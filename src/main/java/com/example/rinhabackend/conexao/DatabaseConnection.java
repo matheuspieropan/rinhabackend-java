@@ -1,30 +1,25 @@
 package com.example.rinhabackend.conexao;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.util.Objects;
+import org.apache.commons.dbcp2.BasicDataSource;
 
 public class DatabaseConnection {
 
-    private static Connection connection;
+    private final static BasicDataSource dataSource;
 
-    private static DatabaseConnection instance;
-
-    private DatabaseConnection() {
+    static {
         try {
             Class.forName("org.postgresql.Driver");
-            connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/rinhabackend-java", "postgres", "123");
-        } catch (ClassNotFoundException | SQLException exception) {
-            exception.printStackTrace();
-            throw new RuntimeException(exception);
+            dataSource = new BasicDataSource();
+            dataSource.setUrl("jdbc:postgresql://localhost:5432/rinhabackend-java");
+            dataSource.setUsername("postgres");
+            dataSource.setPassword("123");
+            dataSource.setMaxTotal(10);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    public static synchronized Connection getConnection() {
-        if (Objects.isNull(instance)) {
-            instance = new DatabaseConnection();
-        }
-        return connection;
+    public static BasicDataSource getDataSource() {
+        return dataSource;
     }
 }
