@@ -1,9 +1,13 @@
-CREATE TABLE public.pessoa
+CREATE TABLE cliente
 (
-    id         bigserial NOT NULL,
-    apelido    varchar(255) NULL,
-    nascimento varchar(255) NULL,
-    nome       varchar(255) NULL,
-    stack      varchar(1000) NULL,
-    CONSTRAINT pessoa_pkey PRIMARY KEY (id)
+    id     SERIAL PRIMARY KEY,
+    limite INT NOT NULL,
+    saldo  INT NOT NULL
 );
+
+INSERT INTO cliente (limite, saldo)
+VALUES (100000, 0),
+       (80000, 0),
+       (1000000, 0),
+       (10000000, 0),
+       (500000, 0);
