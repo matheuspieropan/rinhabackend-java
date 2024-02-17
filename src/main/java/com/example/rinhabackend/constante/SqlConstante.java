@@ -8,5 +8,5 @@ public class SqlConstante {
 
     public static final String saveTransacao = "INSERT INTO transacao(valor, tipo, descricao, realizada_em, id_cliente) VALUES (?, ?, ?, ?, ?)";
 
-    public static final String extratoFindByIdCliente = "SELECT t.valor, t.tipo, t.descricao, t.realizada_em FROM transacao t WHERE t.id = ? ORDER BY t.id DESC LIMIT 10";
+    public static final String extratoFindByIdCliente = "select c.saldo, c.limite, t.valor, t.tipo, t.descricao, t.realizada_em from transacao t join cliente c ON c.id = t.id_cliente where t.id_cliente = ? order by t.id asc limit 10";
 }

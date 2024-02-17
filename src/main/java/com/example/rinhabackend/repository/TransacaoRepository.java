@@ -1,12 +1,15 @@
 package com.example.rinhabackend.repository;
 
 import com.example.rinhabackend.conexao.DatabaseConnection;
+import com.example.rinhabackend.domain.ExtratoResponse;
 import com.example.rinhabackend.domain.Transacao;
+import com.example.rinhabackend.domain.TransacaoResponse;
 
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static com.example.rinhabackend.constante.SqlConstante.extratoFindByIdCliente;
 import static com.example.rinhabackend.constante.SqlConstante.saveTransacao;
@@ -32,10 +35,11 @@ public class TransacaoRepository {
         }
     }
 
-    public List<Transacao> findAll(Long idCliente) {
+    public ExtratoResponse findAll(Long idCliente) {
         Connection connection = DatabaseConnection.getConnection();
         PreparedStatement prepareStatement;
 
+        ExtratoResponse extratoResponse = new ExtratoResponse();
         List<Transacao> transacoes = new ArrayList<>();
 
         try {
@@ -44,7 +48,18 @@ public class TransacaoRepository {
             prepareStatement.setLong(1, idCliente);
 
             try (ResultSet rs = prepareStatement.executeQuery()) {
-                if (rs.next()) {
+                while (rs.next()) {
+
+                    if (Objects.isNull(extratoResponse.getSaldo())) {
+                        ExtratoResponse.Saldo saldo = new ExtratoResponse.Saldo();
+
+                        saldo.setTotal(rs.getInt("saldo"));
+                        saldo.setData(LocalDateTime.now());
+                        saldo.setLimite(rs.getInt("limite"));
+
+                        extratoResponse.setSaldo(saldo);
+                    }
+
                     Transacao transacao = new Transacao();
                     transacao.setValor(rs.getInt("valor"));
 
@@ -63,6 +78,7 @@ public class TransacaoRepository {
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
-        return transacoes;
+        extratoResponse.setTransacoes(transacoes);
+        return extratoResponse;
     }
 }
