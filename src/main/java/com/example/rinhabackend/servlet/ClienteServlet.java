@@ -1,9 +1,6 @@
 package com.example.rinhabackend.servlet;
 
-import com.example.rinhabackend.domain.Cliente;
-import com.example.rinhabackend.domain.ExtratoResponse;
-import com.example.rinhabackend.domain.Transacao;
-import com.example.rinhabackend.domain.TransacaoRequest;
+import com.example.rinhabackend.domain.*;
 import com.example.rinhabackend.enums.HttpStatus;
 import com.example.rinhabackend.exceptions.ValidacaoRequestException;
 import com.example.rinhabackend.repository.ClienteRepository;
@@ -28,6 +25,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import static jakarta.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static jakarta.servlet.http.HttpServletResponse.SC_OK;
 
 @WebServlet("/clientes/*")
@@ -53,20 +51,22 @@ public class ClienteServlet extends HttpServlet {
 
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse response) {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) {
         try {
-            ExtratoResponse extratoResponse = transacaoRepository.findAll(obterIdCliente(req.getRequestURI()));
+            Cliente cliente = obterUsuario(request.getRequestURI());
+            ExtratoResponse extratoResponse = transacaoRepository.findAll(cliente.getId());
+
             response.getWriter().write(objectMapper.writeValueAsString(extratoResponse));
             response.setContentType("application/json");
-        } catch (RuntimeException ex) {
-            ex.printStackTrace();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (ValidacaoRequestException ex) {
+            response.setStatus(ex.getStatusCode());
+        } catch (RuntimeException | IOException ex) {
+            response.setStatus(SC_BAD_REQUEST);
         }
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse resp) throws IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) {
         try {
             Cliente cliente = obterUsuario(request.getRequestURI());
 
@@ -83,17 +83,18 @@ public class ClienteServlet extends HttpServlet {
 
                 realizarValidacoes(transacaoRequest, cliente);
 
-                atualizarSaldo(transacaoRequest, cliente);
+                TransacaoResponse transacaoResponse = atualizarSaldo(transacaoRequest, cliente);
 
                 registraTransacao(transacaoRequest, cliente);
 
-                resp.setStatus(SC_OK);
+                response.setStatus(SC_OK);
+                response.getWriter().write(objectMapper.writeValueAsString(transacaoResponse));
+                response.setContentType("application/json");
             }
         } catch (ValidacaoRequestException ex) {
-            ex.printStackTrace();
-            resp.setStatus(ex.getStatusCode());
-        } catch (RuntimeException ex) {
-            ex.printStackTrace();
+            response.setStatus(ex.getStatusCode());
+        } catch (RuntimeException | IOException ex) {
+            response.setStatus(SC_BAD_REQUEST);
         }
     }
 
@@ -127,12 +128,14 @@ public class ClienteServlet extends HttpServlet {
         debitoNaoPodeSerMenorLimite.validar(transacaoRequest, cliente);
     }
 
-    private void atualizarSaldo(TransacaoRequest transacaoRequest,
-                                Cliente cliente) {
+    private TransacaoResponse atualizarSaldo(TransacaoRequest transacaoRequest,
+                                             Cliente cliente) {
         boolean debito = Character.toUpperCase(transacaoRequest.getTipo()) == 'D';
         int novoSaldo = debito ? (cliente.getSaldo() - transacaoRequest.getValor())
                 : cliente.getSaldo() + transacaoRequest.getValor();
         cliente.setSaldo(novoSaldo);
         clienteRepository.atualizaSaldo(novoSaldo, cliente.getId());
+
+        return new TransacaoResponse(cliente.getLimite(), novoSaldo);
     }
 }

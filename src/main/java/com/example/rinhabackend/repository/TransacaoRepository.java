@@ -3,7 +3,6 @@ package com.example.rinhabackend.repository;
 import com.example.rinhabackend.conexao.DatabaseConnection;
 import com.example.rinhabackend.domain.ExtratoResponse;
 import com.example.rinhabackend.domain.Transacao;
-import com.example.rinhabackend.domain.TransacaoResponse;
 
 import java.sql.*;
 import java.time.LocalDateTime;
