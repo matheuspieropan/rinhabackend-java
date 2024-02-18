@@ -10,7 +10,6 @@ import com.example.rinhabackend.service.strategy.impl.DebitoNaoPodeSerMenorLimit
 import com.example.rinhabackend.service.strategy.impl.DescricaoCaracterMinMaxRequest;
 import com.example.rinhabackend.service.strategy.impl.TipoValidoRequest;
 import com.example.rinhabackend.service.strategy.impl.ValorPositivoRequest;
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -55,8 +54,11 @@ public class ClienteServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
         try {
-            Cliente cliente = obterUsuario(request.getRequestURI());
-            ExtratoResponse extratoResponse = transacaoRepository.findAll(cliente.getId());
+            Long idCliente = obterIdCliente(request.getRequestURI());
+
+            validarCliente(idCliente);
+
+            ExtratoResponse extratoResponse = transacaoRepository.findAll(idCliente);
 
             response.getWriter().write(objectMapper.writeValueAsString(extratoResponse));
             response.setContentType("application/json");
@@ -70,7 +72,8 @@ public class ClienteServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) {
         try {
-            Cliente cliente = obterUsuario(request.getRequestURI());
+            Long idCliente = obterIdCliente(request.getRequestURI());
+            validarCliente(idCliente);
 
             try (BufferedReader bufferedReader = request.getReader()) {
 
@@ -82,6 +85,8 @@ public class ClienteServlet extends HttpServlet {
                 }
 
                 TransacaoRequest transacaoRequest = objectMapper.readValue(json.toString(), TransacaoRequest.class);
+
+                Cliente cliente = obterUsuario(idCliente);
 
                 realizarValidacoes(transacaoRequest, cliente);
 
@@ -111,8 +116,8 @@ public class ClienteServlet extends HttpServlet {
         transacaoRepository.save(transacao);
     }
 
-    private Cliente obterUsuario(String requestURI) {
-        Cliente cliente = clienteRepository.findById(obterIdCliente(requestURI));
+    private Cliente obterUsuario(Long idCliente) {
+        Cliente cliente = clienteRepository.findById(idCliente);
 
         if (Objects.isNull(cliente)) {
             throw new ValidacaoRequestException(HttpStatus.NOT_FOUND.getCodigo(), "Usuário não encontrado.");
@@ -139,5 +144,11 @@ public class ClienteServlet extends HttpServlet {
         clienteRepository.atualizaSaldo(novoSaldo, cliente.getId());
 
         return new TransacaoResponse(cliente.getLimite(), novoSaldo);
+    }
+
+    public void validarCliente(Long id) {
+        if (id < 1 || id > 5) {
+            throw new ValidacaoRequestException(HttpStatus.NOT_FOUND.getCodigo(), "Usuário não encontrado.");
+        }
     }
 }
