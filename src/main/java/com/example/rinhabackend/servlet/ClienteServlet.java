@@ -86,9 +86,11 @@ public class ClienteServlet extends HttpServlet {
 
                 TransacaoRequest transacaoRequest = objectMapper.readValue(json.toString(), TransacaoRequest.class);
 
+                validacoes.forEach(impl -> impl.validar(transacaoRequest));
+
                 Cliente cliente = obterUsuario(idCliente);
 
-                realizarValidacoes(transacaoRequest, cliente);
+                debitoNaoPodeSerMenorLimite.validar(transacaoRequest, cliente);
 
                 TransacaoResponse transacaoResponse = atualizarSaldo(transacaoRequest, cliente);
 
@@ -127,12 +129,6 @@ public class ClienteServlet extends HttpServlet {
 
     private Long obterIdCliente(String requestURI) {
         return Long.valueOf(requestURI.split("/")[2]);
-    }
-
-    private void realizarValidacoes(TransacaoRequest transacaoRequest,
-                                    Cliente cliente) {
-        validacoes.forEach(impl -> impl.validar(transacaoRequest));
-        debitoNaoPodeSerMenorLimite.validar(transacaoRequest, cliente);
     }
 
     private TransacaoResponse atualizarSaldo(TransacaoRequest transacaoRequest,
