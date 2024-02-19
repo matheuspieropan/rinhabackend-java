@@ -1,6 +1,10 @@
 package com.example.rinhabackend.servlet;
 
-import com.example.rinhabackend.domain.*;
+import com.example.rinhabackend.domain.Cliente;
+import com.example.rinhabackend.domain.ExtratoResponse;
+import com.example.rinhabackend.domain.Transacao;
+import com.example.rinhabackend.domain.TransacaoRequest;
+import com.example.rinhabackend.domain.TransacaoResponse;
 import com.example.rinhabackend.enums.HttpStatus;
 import com.example.rinhabackend.exceptions.ValidacaoRequestException;
 import com.example.rinhabackend.repository.ClienteRepository;
@@ -94,8 +98,6 @@ public class ClienteServlet extends HttpServlet {
 
                 TransacaoResponse transacaoResponse = atualizarSaldo(transacaoRequest, cliente);
 
-                registraTransacao(transacaoRequest, cliente);
-
                 response.setStatus(SC_OK);
                 response.getWriter().write(objectMapper.writeValueAsString(transacaoResponse));
                 response.setContentType("application/json");
@@ -105,17 +107,6 @@ public class ClienteServlet extends HttpServlet {
         } catch (IOException ex) {
             response.setStatus(SC_BAD_REQUEST);
         }
-    }
-
-    private void registraTransacao(TransacaoRequest transacaoRequest, Cliente cliente) {
-        Transacao transacao = new Transacao(
-                transacaoRequest.getValor(),
-                transacaoRequest.getTipo(),
-                transacaoRequest.getDescricao(),
-                LocalDateTime.now(),
-                cliente.getId());
-
-        transacaoRepository.save(transacao);
     }
 
     private Cliente obterUsuario(Long idCliente) {
@@ -134,10 +125,16 @@ public class ClienteServlet extends HttpServlet {
     private TransacaoResponse atualizarSaldo(TransacaoRequest transacaoRequest,
                                              Cliente cliente) {
         boolean debito = Character.toUpperCase(transacaoRequest.getTipo()) == 'D';
-        int novoSaldo = debito ? (cliente.getSaldo() - transacaoRequest.getValor())
-                : cliente.getSaldo() + transacaoRequest.getValor();
-        cliente.setSaldo(novoSaldo);
-        clienteRepository.atualizaSaldo(novoSaldo, cliente.getId());
+        int novoSaldo = debito ? (cliente.getSaldo() - transacaoRequest.getValor()) : cliente.getSaldo() + transacaoRequest.getValor();
+
+        Transacao transacao = new Transacao(
+                transacaoRequest.getValor(),
+                transacaoRequest.getTipo(),
+                transacaoRequest.getDescricao(),
+                LocalDateTime.now(),
+                cliente.getId());
+
+        clienteRepository.atualizaSaldoERegistraTransacao(novoSaldo, cliente.getId(), transacao);
 
         return new TransacaoResponse(cliente.getLimite(), novoSaldo);
     }
