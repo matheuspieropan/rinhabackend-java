@@ -28,4 +28,4 @@ services:
       POSTGRES_PASSWORD: 123
       POSTGRES_DB: rinhabackend-java
     volumes:
-      - ./script.sql:/docker-entrypoint-initdb.d/script.sql
+      - ./scripts/script.sql:/docker-entrypoint-initdb.d/script.sql
