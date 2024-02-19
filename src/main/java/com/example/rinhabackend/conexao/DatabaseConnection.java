@@ -1,25 +1,26 @@
 package com.example.rinhabackend.conexao;
 
-import org.apache.commons.dbcp2.BasicDataSource;
+import com.zaxxer.hikari.HikariDataSource;
 
 public class DatabaseConnection {
 
-    private final static BasicDataSource dataSource;
+    private final static HikariDataSource dataSource;
 
     static {
         try {
             Class.forName("org.postgresql.Driver");
-            dataSource = new BasicDataSource();
-            dataSource.setUrl("jdbc:postgresql://localhost:5432/rinhabackend-java");
+            dataSource = new HikariDataSource();
+            dataSource.setJdbcUrl("jdbc:postgresql://localhost:5432/rinhabackend-java");
             dataSource.setUsername("postgres");
             dataSource.setPassword("123");
-            dataSource.setMaxTotal(10);
+            dataSource.setMaximumPoolSize(20);
+            dataSource.setConnectionTimeout(1000);
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static BasicDataSource getDataSource() {
+    public static HikariDataSource getDataSource() {
         return dataSource;
     }
 }
