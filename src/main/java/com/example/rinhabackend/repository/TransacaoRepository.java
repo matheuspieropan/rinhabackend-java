@@ -1,81 +1,41 @@
 package com.example.rinhabackend.repository;
 
 import com.example.rinhabackend.conexao.DatabaseConnection;
-import com.example.rinhabackend.domain.ExtratoResponse;
-import com.example.rinhabackend.domain.Transacao;
+import com.example.rinhabackend.entity.Transacao;
+import com.example.rinhabackend.domain.TransacaoResponse;
+import com.example.rinhabackend.exceptions.ValidacaoRequestException;
+import org.postgresql.util.PSQLException;
 
-import java.sql.*;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
-import static com.example.rinhabackend.constante.SqlConstante.extratoFindByIdCliente;
-import static com.example.rinhabackend.constante.SqlConstante.saveTransacao;
+import static com.example.rinhabackend.enums.HttpStatus.*;
 
 public class TransacaoRepository {
 
-    public void save(Transacao transacao) {
+    public TransacaoResponse atualizaSaldoERegistraTransacao(Long idCliente, Transacao transacao) {
+        TransacaoResponse transacaoResponse = new TransacaoResponse();
         try (Connection connection = DatabaseConnection.getDataSource().getConnection()) {
+            String procedureCall = "{call public.efetuar_transacao(?, ?, ?, ?)}";
+            CallableStatement callableStatement = connection.prepareCall(procedureCall);
 
-            PreparedStatement prepareStatement = connection.prepareStatement(saveTransacao);
+            callableStatement.setInt(1, idCliente.intValue());
+            callableStatement.setString(2, String.valueOf(transacao.getTipo()).toLowerCase());
+            callableStatement.setInt(3, transacao.getValor());
+            callableStatement.setString(4, transacao.getDescricao());
 
-            prepareStatement.setInt(1, transacao.getValor());
-            prepareStatement.setObject(2, transacao.getTipo());
-            prepareStatement.setString(3, transacao.getDescricao());
-            prepareStatement.setObject(4, LocalDateTime.now());
-            prepareStatement.setLong(5, transacao.getIdCliente());
-
-            prepareStatement.executeUpdate();
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-    }
-
-    public ExtratoResponse findAll(Long idCliente) {
-        PreparedStatement prepareStatement;
-
-        ExtratoResponse extratoResponse = new ExtratoResponse();
-        List<Transacao> transacoes = new ArrayList<>();
-
-        try (Connection connection = DatabaseConnection.getDataSource().getConnection()) {
-
-            prepareStatement = connection.prepareStatement(extratoFindByIdCliente);
-            prepareStatement.setLong(1, idCliente);
-
-            try (ResultSet rs = prepareStatement.executeQuery()) {
-                while (rs.next()) {
-
-                    if (Objects.isNull(extratoResponse.getSaldo())) {
-                        ExtratoResponse.Saldo saldo = new ExtratoResponse.Saldo();
-
-                        saldo.setTotal(rs.getInt("saldo"));
-                        saldo.setData(LocalDateTime.now());
-                        saldo.setLimite(rs.getInt("limite"));
-
-                        extratoResponse.setSaldo(saldo);
-                    }
-
-                    Transacao transacao = new Transacao();
-                    transacao.setValor(rs.getInt("valor"));
-
-                    String tipoString = rs.getString("tipo");
-                    char tipoChar = tipoString.charAt(0);
-
-                    transacao.setTipo(tipoChar);
-                    transacao.setDescricao(rs.getString("descricao"));
-
-                    Timestamp realizadaEm = (Timestamp) rs.getObject("realizada_em");
-
-                    transacao.setRealizadaEm(realizadaEm.toLocalDateTime());
-                    transacoes.add(transacao);
-                }
+            ResultSet resultSet = callableStatement.executeQuery();
+            if (resultSet.next()) {
+                transacaoResponse.setLimite(resultSet.getInt("limiteRetorno"));
+                transacaoResponse.setSaldo(resultSet.getInt("saldoRetorno"));
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            if (ex instanceof PSQLException) {
+                throw new ValidacaoRequestException(UNPROCESSABLE_ENTITY.getCodigo(), "Transação ultrapassa valor limite");
+            }
         }
-
-        extratoResponse.setTransacoes(transacoes);
-        return extratoResponse;
+        return transacaoResponse;
     }
 }

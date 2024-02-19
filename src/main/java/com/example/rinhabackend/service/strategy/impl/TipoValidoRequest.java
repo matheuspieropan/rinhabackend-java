@@ -4,9 +4,9 @@ import com.example.rinhabackend.domain.TransacaoRequest;
 import com.example.rinhabackend.exceptions.ValidacaoRequestException;
 import com.example.rinhabackend.service.strategy.ValidacaoTransacaoRequest;
 
-import static jakarta.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
-
 import java.util.Objects;
+
+import static com.example.rinhabackend.enums.HttpStatus.UNPROCESSABLE_ENTITY;
 
 public class TipoValidoRequest implements ValidacaoTransacaoRequest {
 
@@ -16,7 +16,7 @@ public class TipoValidoRequest implements ValidacaoTransacaoRequest {
 
         if (Objects.isNull(transacaoRequest.getTipo()) || (Character.toUpperCase(transacaoRequest.getTipo()) !=
                 debito && Character.toUpperCase(transacaoRequest.getTipo()) != credito)) {
-            throw new ValidacaoRequestException(SC_BAD_REQUEST, "Campo 'Tipo' nulo ou com valor diferente do permitido.");
+            throw new ValidacaoRequestException(UNPROCESSABLE_ENTITY.getCodigo(), "Campo 'Tipo' nulo ou com valor diferente do permitido.");
         }
     }
 }

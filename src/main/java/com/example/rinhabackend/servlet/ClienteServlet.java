@@ -1,19 +1,11 @@
 package com.example.rinhabackend.servlet;
 
-import com.example.rinhabackend.domain.Cliente;
-import com.example.rinhabackend.domain.ExtratoResponse;
-import com.example.rinhabackend.domain.Transacao;
 import com.example.rinhabackend.domain.TransacaoRequest;
 import com.example.rinhabackend.domain.TransacaoResponse;
 import com.example.rinhabackend.enums.HttpStatus;
 import com.example.rinhabackend.exceptions.ValidacaoRequestException;
-import com.example.rinhabackend.repository.ClienteRepository;
-import com.example.rinhabackend.repository.TransacaoRepository;
-import com.example.rinhabackend.service.strategy.ValidacaoTransacaoRequest;
-import com.example.rinhabackend.service.strategy.impl.DebitoNaoPodeSerMenorLimite;
-import com.example.rinhabackend.service.strategy.impl.DescricaoCaracterMinMaxRequest;
-import com.example.rinhabackend.service.strategy.impl.TipoValidoRequest;
-import com.example.rinhabackend.service.strategy.impl.ValorPositivoRequest;
+import com.example.rinhabackend.service.ClienteService;
+import com.example.rinhabackend.service.ExtratoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -24,10 +16,6 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
 
 import static jakarta.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static jakarta.servlet.http.HttpServletResponse.SC_OK;
@@ -38,34 +26,23 @@ public class ClienteServlet extends HttpServlet {
     public ClienteServlet() {
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        //objectMapper.configure(JsonParser.Feature.INCLUDE_SOURCE_IN_LOCATION, true);
     }
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    private final ClienteRepository clienteRepository = new ClienteRepository();
+    private final ExtratoService extratoService = new ExtratoService();
 
-    private final TransacaoRepository transacaoRepository = new TransacaoRepository();
-
-    private final List<ValidacaoTransacaoRequest> validacoes = Arrays.asList(
-            new ValorPositivoRequest(),
-            new TipoValidoRequest(),
-            new DescricaoCaracterMinMaxRequest());
-
-    private final DebitoNaoPodeSerMenorLimite debitoNaoPodeSerMenorLimite = new DebitoNaoPodeSerMenorLimite();
-
+    private final ClienteService clienteService = new ClienteService();
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) {
+    protected synchronized void doGet(HttpServletRequest request, HttpServletResponse response) {
         try {
             Long idCliente = obterIdCliente(request.getRequestURI());
-
             validarCliente(idCliente);
 
-            ExtratoResponse extratoResponse = transacaoRepository.findAll(idCliente);
-
-            response.getWriter().write(objectMapper.writeValueAsString(extratoResponse));
+            response.getWriter().write(objectMapper.writeValueAsString(extratoService.obterExtrato(idCliente)));
             response.setContentType("application/json");
+
         } catch (ValidacaoRequestException ex) {
             response.setStatus(ex.getStatusCode());
         } catch (IOException ex) {
@@ -74,7 +51,7 @@ public class ClienteServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) {
+    protected synchronized void doPost(HttpServletRequest request, HttpServletResponse response) {
         try {
             Long idCliente = obterIdCliente(request.getRequestURI());
             validarCliente(idCliente);
@@ -89,14 +66,7 @@ public class ClienteServlet extends HttpServlet {
                 }
 
                 TransacaoRequest transacaoRequest = objectMapper.readValue(json.toString(), TransacaoRequest.class);
-
-                validacoes.forEach(impl -> impl.validar(transacaoRequest));
-
-                Cliente cliente = obterUsuario(idCliente);
-
-                debitoNaoPodeSerMenorLimite.validar(transacaoRequest, cliente);
-
-                TransacaoResponse transacaoResponse = atualizarSaldo(transacaoRequest, cliente);
+                TransacaoResponse transacaoResponse = clienteService.transacao(idCliente, transacaoRequest);
 
                 response.setStatus(SC_OK);
                 response.getWriter().write(objectMapper.writeValueAsString(transacaoResponse));
@@ -109,34 +79,8 @@ public class ClienteServlet extends HttpServlet {
         }
     }
 
-    private Cliente obterUsuario(Long idCliente) {
-        Cliente cliente = clienteRepository.findById(idCliente);
-
-        if (Objects.isNull(cliente)) {
-            throw new ValidacaoRequestException(HttpStatus.NOT_FOUND.getCodigo(), "Usuário não encontrado.");
-        }
-        return cliente;
-    }
-
     private Long obterIdCliente(String requestURI) {
         return Long.valueOf(requestURI.split("/")[2]);
-    }
-
-    private TransacaoResponse atualizarSaldo(TransacaoRequest transacaoRequest,
-                                             Cliente cliente) {
-        boolean debito = Character.toUpperCase(transacaoRequest.getTipo()) == 'D';
-        int novoSaldo = debito ? (cliente.getSaldo() - transacaoRequest.getValor()) : cliente.getSaldo() + transacaoRequest.getValor();
-
-        Transacao transacao = new Transacao(
-                transacaoRequest.getValor(),
-                transacaoRequest.getTipo(),
-                transacaoRequest.getDescricao(),
-                LocalDateTime.now(),
-                cliente.getId());
-
-        clienteRepository.atualizaSaldoERegistraTransacao(novoSaldo, cliente.getId(), transacao);
-
-        return new TransacaoResponse(cliente.getLimite(), novoSaldo);
     }
 
     public void validarCliente(Long id) {

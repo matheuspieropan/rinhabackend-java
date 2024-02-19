@@ -7,7 +7,7 @@ import lombok.Setter;
 @Setter
 public class TransacaoRequest {
 
-    private Integer valor;
+    private String valor;
 
     private Character tipo;
 

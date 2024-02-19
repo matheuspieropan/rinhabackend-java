@@ -6,7 +6,7 @@ import com.example.rinhabackend.service.strategy.ValidacaoTransacaoRequest;
 
 import java.util.Objects;
 
-import static jakarta.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static com.example.rinhabackend.enums.HttpStatus.UNPROCESSABLE_ENTITY;
 
 public class DescricaoCaracterMinMaxRequest implements ValidacaoTransacaoRequest {
 
@@ -14,7 +14,7 @@ public class DescricaoCaracterMinMaxRequest implements ValidacaoTransacaoRequest
         if (Objects.isNull(transacaoRequest.getDescricao())
                 || transacaoRequest.getDescricao().isEmpty()
                 || transacaoRequest.getDescricao().length() > 10) {
-            throw new ValidacaoRequestException(SC_BAD_REQUEST, "Operação não permitida. Campo descriço nulo ou com descrição vazia ou com mais de 10 caracteres.");
+            throw new ValidacaoRequestException(UNPROCESSABLE_ENTITY.getCodigo(), "Operação não permitida. Campo descriço nulo ou com descrição vazia ou com mais de 10 caracteres.");
         }
     }
 }

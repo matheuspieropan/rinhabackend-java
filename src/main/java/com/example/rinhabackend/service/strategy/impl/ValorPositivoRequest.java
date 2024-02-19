@@ -4,15 +4,15 @@ import com.example.rinhabackend.domain.TransacaoRequest;
 import com.example.rinhabackend.exceptions.ValidacaoRequestException;
 import com.example.rinhabackend.service.strategy.ValidacaoTransacaoRequest;
 
-import static jakarta.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
-
-import java.util.Objects;
+import static com.example.rinhabackend.enums.HttpStatus.UNPROCESSABLE_ENTITY;
 
 public class ValorPositivoRequest implements ValidacaoTransacaoRequest {
 
     public void validar(TransacaoRequest transacaoRequest) {
-        if (Objects.isNull(transacaoRequest.getValor()) || transacaoRequest.getValor() < 0) {
-            throw new ValidacaoRequestException(SC_BAD_REQUEST, "Campo 'Valor' nulo ou com valor negativo.");
+        try {
+            Integer.parseInt(transacaoRequest.getValor());
+        } catch (Exception ex) {
+            throw new ValidacaoRequestException(UNPROCESSABLE_ENTITY.getCodigo(), "Campo 'Valor' nulo ou com valor negativo.");
         }
     }
 }
