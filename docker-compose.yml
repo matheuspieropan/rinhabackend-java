@@ -1,14 +1,13 @@
 version: '3.5'
 services:
   api1:
-    image: rinha
+    image: matheuspieropan/rinhabackend
     depends_on:
       - db
   api2:
-    image: rinha
+    image: matheuspieropan/rinhabackend
     depends_on:
       - db
-
   nginx:
     image: nginx:latest
     volumes:
@@ -20,7 +19,6 @@ services:
       - "9999:9999"
   db:
     image: postgres
-    command: "postgres -c max_connections=200"
     ports:
       - "5433:5432"
     environment:
