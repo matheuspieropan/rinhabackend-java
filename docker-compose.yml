@@ -7,8 +7,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "0.35"
-          memory: "90MB"
+          cpus: "0.4"
+          memory: "125MB"
   api2:
     image: matheuspieropan/rinhabackend
     depends_on:
@@ -16,8 +16,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "0.35"
-          memory: "90MB"
+          cpus: "0.4"
+          memory: "125MB"
   nginx:
     image: nginx:latest
     volumes:
@@ -29,7 +29,7 @@ services:
       resources:
         limits:
           cpus: "0.2"
-          memory: "50MB"
+          memory: "40MB"
     ports:
       - "9999:9999"
   db:
@@ -45,5 +45,5 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "0.6"
-          memory: "270MB"
+          cpus: "0.5"
+          memory: "210MB"
