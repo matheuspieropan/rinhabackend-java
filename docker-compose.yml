@@ -4,10 +4,20 @@ services:
     image: matheuspieropan/rinhabackend
     depends_on:
       - db
+    deploy:
+      resources:
+        limits:
+          cpus: "0.35"
+          memory: "90MB"
   api2:
     image: matheuspieropan/rinhabackend
     depends_on:
       - db
+    deploy:
+      resources:
+        limits:
+          cpus: "0.35"
+          memory: "90MB"
   nginx:
     image: nginx:latest
     volumes:
@@ -15,6 +25,11 @@ services:
     depends_on:
       - api1
       - api2
+    deploy:
+      resources:
+        limits:
+          cpus: "0.2"
+          memory: "50MB"
     ports:
       - "9999:9999"
   db:
@@ -27,3 +42,8 @@ services:
       POSTGRES_DB: rinhabackend-java
     volumes:
       - ./scripts/script.sql:/docker-entrypoint-initdb.d/script.sql
+    deploy:
+      resources:
+        limits:
+          cpus: "0.6"
+          memory: "270MB"
