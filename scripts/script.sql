@@ -68,3 +68,5 @@ RETURN QUERY SELECT cliente.saldo, cliente.limite;
 END;
 $$
 LANGUAGE plpgsql;
+
+CREATE INDEX idx_transacao_id_cliente_realizada_em ON transacao (id_cliente, realizada_em DESC);
