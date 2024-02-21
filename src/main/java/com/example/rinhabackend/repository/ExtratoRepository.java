@@ -12,7 +12,7 @@ import java.util.Objects;
 
 public class ExtratoRepository {
 
-    public ExtratoResponse findAll(Long idCliente) {
+    public ExtratoResponse findAllById(Long idCliente) {
         PreparedStatement prepareStatement;
 
         ExtratoResponse extratoResponse = new ExtratoResponse();

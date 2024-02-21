@@ -4,6 +4,7 @@ import com.example.rinhabackend.dto.TransacaoRequest;
 import com.example.rinhabackend.dto.TransacaoResponse;
 import com.example.rinhabackend.enums.HttpStatus;
 import com.example.rinhabackend.exceptions.ValidacaoRequestException;
+import com.example.rinhabackend.repository.ExtratoRepository;
 import com.example.rinhabackend.service.ClienteService;
 import com.example.rinhabackend.service.ExtratoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,8 +31,18 @@ public class ClienteServlet extends HttpServlet {
     private final ClienteService clienteService = new ClienteService();
 
     public ClienteServlet() {
+        aquecimento();
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+    }
+
+    // isso pode? rs
+    private void aquecimento() {
+        long idCliente = 1L;
+        while (idCliente < 6) {
+            new ExtratoRepository().findAllById(idCliente);
+            idCliente++;
+        }
     }
 
     @Override
@@ -54,7 +65,7 @@ public class ClienteServlet extends HttpServlet {
         try {
             Long idCliente = obterIdCliente(request.getRequestURI());
 
-            try (BufferedReader bufferedReader = request.getReader()) {
+            try (BufferedReader bufferedReader = new BufferedReader(request.getReader(), 1)) {
 
                 StringBuilder json = new StringBuilder();
                 String line;

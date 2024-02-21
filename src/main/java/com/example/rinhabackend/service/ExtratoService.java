@@ -8,6 +8,6 @@ public class ExtratoService {
     private final ExtratoRepository extratoRepository = new ExtratoRepository();
 
     public ExtratoResponse obterExtrato(Long idCliente) {
-        return extratoRepository.findAll(idCliente);
+        return extratoRepository.findAllById(idCliente);
     }
 }
