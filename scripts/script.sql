@@ -1,4 +1,4 @@
-CREATE TABLE cliente
+CREATE UNLOGGED TABLE cliente
 (
     id     SERIAL PRIMARY KEY,
     limite INT NOT NULL,
@@ -12,7 +12,7 @@ VALUES (100000, 0),
        (10000000, 0),
        (500000, 0);
 
-CREATE TABLE TRANSACAO
+CREATE UNLOGGED TABLE TRANSACAO
 (
     ID           SERIAL PRIMARY KEY,
     ID_CLIENTE   INT         NOT NULL,
@@ -69,4 +69,5 @@ END;
 $$
 LANGUAGE plpgsql;
 
+CREATE INDEX idx_transacao_id_cliente_realizada_em ON transacao (id_cliente);
 CREATE INDEX idx_transacao_id_cliente_realizada_em ON transacao (id_cliente, realizada_em DESC);
