@@ -7,7 +7,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "0.65"
+          cpus: "0.6"
           memory: "210MB"
   api2:
     image: matheuspieropan/rinhabackend
@@ -16,7 +16,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "0.65"
+          cpus: "0.6"
           memory: "210MB"
   nginx:
     image: nginx:latest
@@ -42,9 +42,8 @@ services:
       POSTGRES_DB: rinhabackend-java
     volumes:
       - ./scripts/script.sql:/docker-entrypoint-initdb.d/script.sql
-    command: postgres -c max_connections=30
     deploy:
       resources:
         limits:
-          cpus: "0.15"
+          cpus: "0.25"
           memory: "120MB"
