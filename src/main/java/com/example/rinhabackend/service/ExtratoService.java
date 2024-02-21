@@ -1,6 +1,6 @@
 package com.example.rinhabackend.service;
 
-import com.example.rinhabackend.domain.ExtratoResponse;
+import com.example.rinhabackend.dto.ExtratoResponse;
 import com.example.rinhabackend.repository.ExtratoRepository;
 
 public class ExtratoService {

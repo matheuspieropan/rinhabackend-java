@@ -1,7 +1,7 @@
 package com.example.rinhabackend.servlet;
 
-import com.example.rinhabackend.domain.TransacaoRequest;
-import com.example.rinhabackend.domain.TransacaoResponse;
+import com.example.rinhabackend.dto.TransacaoRequest;
+import com.example.rinhabackend.dto.TransacaoResponse;
 import com.example.rinhabackend.enums.HttpStatus;
 import com.example.rinhabackend.exceptions.ValidacaoRequestException;
 import com.example.rinhabackend.service.ClienteService;
@@ -23,22 +23,21 @@ import static jakarta.servlet.http.HttpServletResponse.SC_OK;
 @WebServlet("/clientes/*")
 public class ClienteServlet extends HttpServlet {
 
-    public ClienteServlet() {
-        objectMapper.registerModule(new JavaTimeModule());
-        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-    }
-
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     private final ExtratoService extratoService = new ExtratoService();
 
     private final ClienteService clienteService = new ClienteService();
 
+    public ClienteServlet() {
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+    }
+
     @Override
     protected synchronized void doGet(HttpServletRequest request, HttpServletResponse response) {
         try {
             Long idCliente = obterIdCliente(request.getRequestURI());
-            validarCliente(idCliente);
 
             response.getWriter().write(objectMapper.writeValueAsString(extratoService.obterExtrato(idCliente)));
             response.setContentType("application/json");
@@ -54,7 +53,6 @@ public class ClienteServlet extends HttpServlet {
     protected synchronized void doPost(HttpServletRequest request, HttpServletResponse response) {
         try {
             Long idCliente = obterIdCliente(request.getRequestURI());
-            validarCliente(idCliente);
 
             try (BufferedReader bufferedReader = request.getReader()) {
 
@@ -80,11 +78,14 @@ public class ClienteServlet extends HttpServlet {
     }
 
     private Long obterIdCliente(String requestURI) {
-        return Long.valueOf(requestURI.split("/")[2]);
+        Long idCliente = Long.valueOf(requestURI.split("/")[2]);
+        validarCliente(idCliente);
+
+        return idCliente;
     }
 
-    public void validarCliente(Long id) {
-        if (id < 1 || id > 5) {
+    public void validarCliente(Long idCliente) {
+        if (idCliente < 1 || idCliente > 5) {
             throw new ValidacaoRequestException(HttpStatus.NOT_FOUND.getCodigo(), "Usuário não encontrado.");
         }
     }

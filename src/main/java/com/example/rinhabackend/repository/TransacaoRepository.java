@@ -1,17 +1,16 @@
 package com.example.rinhabackend.repository;
 
 import com.example.rinhabackend.conexao.DatabaseConnection;
-import com.example.rinhabackend.entity.Transacao;
-import com.example.rinhabackend.domain.TransacaoResponse;
+import com.example.rinhabackend.dto.TransacaoResponse;
 import com.example.rinhabackend.exceptions.ValidacaoRequestException;
-import org.postgresql.util.PSQLException;
+import com.example.rinhabackend.model.Transacao;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import static com.example.rinhabackend.enums.HttpStatus.*;
+import static com.example.rinhabackend.enums.HttpStatus.UNPROCESSABLE_ENTITY;
 
 public class TransacaoRepository {
 
@@ -32,9 +31,7 @@ public class TransacaoRepository {
                 transacaoResponse.setSaldo(resultSet.getInt("saldoRetorno"));
             }
         } catch (SQLException ex) {
-            if (ex instanceof PSQLException) {
-                throw new ValidacaoRequestException(UNPROCESSABLE_ENTITY.getCodigo(), "Transação ultrapassa valor limite");
-            }
+            throw new ValidacaoRequestException(UNPROCESSABLE_ENTITY.getCodigo(), "Transação ultrapassa valor limite");
         }
         return transacaoResponse;
     }

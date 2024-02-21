@@ -1,4 +1,4 @@
-package com.example.rinhabackend.domain;
+package com.example.rinhabackend.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

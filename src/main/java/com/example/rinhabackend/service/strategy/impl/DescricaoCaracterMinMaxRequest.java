@@ -1,6 +1,6 @@
 package com.example.rinhabackend.service.strategy.impl;
 
-import com.example.rinhabackend.domain.TransacaoRequest;
+import com.example.rinhabackend.dto.TransacaoRequest;
 import com.example.rinhabackend.exceptions.ValidacaoRequestException;
 import com.example.rinhabackend.service.strategy.ValidacaoTransacaoRequest;
 

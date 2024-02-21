@@ -1,6 +1,6 @@
-package com.example.rinhabackend.domain;
+package com.example.rinhabackend.dto;
 
-import com.example.rinhabackend.entity.Transacao;
+import com.example.rinhabackend.model.Transacao;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;

@@ -1,4 +1,4 @@
-package com.example.rinhabackend.entity;
+package com.example.rinhabackend.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

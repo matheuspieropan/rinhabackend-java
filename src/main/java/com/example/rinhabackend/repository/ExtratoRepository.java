@@ -1,16 +1,14 @@
 package com.example.rinhabackend.repository;
 
 import com.example.rinhabackend.conexao.DatabaseConnection;
-import com.example.rinhabackend.domain.ExtratoResponse;
-import com.example.rinhabackend.entity.Transacao;
+import com.example.rinhabackend.dto.ExtratoResponse;
+import com.example.rinhabackend.model.Transacao;
 
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
-import static com.example.rinhabackend.constante.SqlConstante.extratoFindByIdCliente;
 
 public class ExtratoRepository {
 
@@ -23,14 +21,16 @@ public class ExtratoRepository {
 
         try (Connection connection = DatabaseConnection.getDataSource().getConnection()) {
 
-            prepareStatement = connection.prepareStatement(extratoFindByIdCliente);
+            prepareStatement = connection.prepareStatement("SELECT c.saldo, c.limite, t.valor, t.tipo, t.descricao, t.realizada_em from cliente c left join transacao t " +
+                    "ON t.id_cliente = c.id WHERE c.id = ? order by t.realizada_em DESC limit 10");
             prepareStatement.setLong(1, idCliente);
+
             boolean extratoResponseNaoPreenchido = true;
 
             try (ResultSet rs = prepareStatement.executeQuery()) {
                 while (rs.next()) {
 
-                    if(extratoResponseNaoPreenchido){
+                    if (extratoResponseNaoPreenchido) {
                         ExtratoResponse.Saldo saldo = new ExtratoResponse.Saldo();
 
                         saldo.setTotal(rs.getInt("saldo"));
@@ -40,7 +40,7 @@ public class ExtratoRepository {
                         extratoResponseNaoPreenchido = false;
                     }
 
-                    if(Objects.isNull(rs.getString("tipo"))){
+                    if (Objects.isNull(rs.getString("tipo"))) {
                         break;
                     }
 
@@ -53,14 +53,11 @@ public class ExtratoRepository {
                     transacao.setTipo(tipoChar);
                     transacao.setDescricao(rs.getString("descricao"));
 
-                    Timestamp realizadaEm = (Timestamp) rs.getObject("realizada_em");
-
-                    transacao.setRealizadaEm(realizadaEm.toLocalDateTime());
+                    transacao.setRealizadaEm((Timestamp) rs.getObject("realizada_em"));
                     transacoes.add(transacao);
                 }
             }
-        } catch (
-                SQLException ex) {
+        } catch (SQLException ex) {
             ex.printStackTrace();
         }
 

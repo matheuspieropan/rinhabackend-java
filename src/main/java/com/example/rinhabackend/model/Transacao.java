@@ -1,14 +1,16 @@
-package com.example.rinhabackend.entity;
+package com.example.rinhabackend.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -22,7 +24,7 @@ public class Transacao {
     private String descricao;
 
     @JsonProperty("realizada_em")
-    private LocalDateTime realizadaEm;
+    private Timestamp realizadaEm;
 
     @JsonIgnore
     private Long idCliente;
