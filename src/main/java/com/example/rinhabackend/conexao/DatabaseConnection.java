@@ -10,7 +10,7 @@ public class DatabaseConnection {
         try {
             Class.forName("org.postgresql.Driver");
             dataSource = new HikariDataSource();
-            dataSource.setJdbcUrl("jdbc:postgresql://localhost:5432/rinhabackend-java");
+            dataSource.setJdbcUrl("jdbc:postgresql://db:5432/rinhabackend-java");
             dataSource.setUsername("postgres");
             dataSource.setPassword("123");
             dataSource.setMaximumPoolSize(15);
