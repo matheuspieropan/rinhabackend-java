@@ -31,12 +31,7 @@ public class ClienteService {
     }
 
     private TransacaoResponse realizarTransacao(TransacaoRequest transacaoRequest, Long idCliente) {
-        Transacao transacao = Transacao.builder()
-                .valor(Integer.parseInt(transacaoRequest.getValor()))
-                .tipo(transacaoRequest.getTipo())
-                .descricao(transacaoRequest.getDescricao())
-                .idCliente(idCliente)
-                .build();
+        Transacao transacao = new Transacao(Integer.parseInt(transacaoRequest.getValor()), transacaoRequest.getTipo(), transacaoRequest.getDescricao(), idCliente);
 
         return transacaoRepository.atualizaSaldoERegistraTransacao(idCliente, transacao);
     }

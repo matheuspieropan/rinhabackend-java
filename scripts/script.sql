@@ -1,6 +1,6 @@
 CREATE UNLOGGED TABLE cliente
 (
-    id     SERIAL PRIMARY KEY,
+    id     INT PRIMARY KEY,
     limite INT NOT NULL,
     saldo  INT NOT NULL
 );
@@ -14,7 +14,7 @@ VALUES (100000, 0),
 
 CREATE UNLOGGED TABLE TRANSACAO
 (
-    ID           SERIAL PRIMARY KEY,
+    ID           INT         PRIMARY KEY,
     ID_CLIENTE   INT         NOT NULL,
     VALOR        INT         NOT NULL,
     TIPO         VARCHAR(1)  NOT NULL,

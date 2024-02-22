@@ -13,7 +13,7 @@ public class DatabaseConnection {
             dataSource.setJdbcUrl("jdbc:postgresql://db:5432/rinhabackend-java");
             dataSource.setUsername("postgres");
             dataSource.setPassword("123");
-            dataSource.setMaximumPoolSize(15);
+            dataSource.setMaximumPoolSize(10);
             dataSource.setMinimumIdle(5);
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
