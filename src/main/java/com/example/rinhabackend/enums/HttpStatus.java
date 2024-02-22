@@ -1,10 +1,5 @@
 package com.example.rinhabackend.enums;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
-@Getter
-@AllArgsConstructor
 public enum HttpStatus {
 
     NOT_FOUND(404, "Not Found"),
@@ -14,4 +9,17 @@ public enum HttpStatus {
     private int codigo;
 
     private String descricao;
+
+    public int getCodigo() {
+        return codigo;
+    }
+
+    public String getDescricao() {
+        return descricao;
+    }
+
+    HttpStatus(int codigo, String descricao) {
+        this.codigo = codigo;
+        this.descricao = descricao;
+    }
 }

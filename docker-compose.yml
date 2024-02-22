@@ -7,7 +7,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "0.6"
+          cpus: "0.525"
           memory: "210MB"
   api2:
     image: matheuspieropan/rinhabackend
@@ -16,7 +16,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "0.6"
+          cpus: "0.525"
           memory: "210MB"
   nginx:
     image: nginx:latest
@@ -40,10 +40,11 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 123
       POSTGRES_DB: rinhabackend-java
+    command: "postgres -c synchronous_commit=0 -c full_page_writes=0"
     volumes:
       - ./scripts/script.sql:/docker-entrypoint-initdb.d/script.sql
     deploy:
       resources:
         limits:
-          cpus: "0.25"
+          cpus: "0.4"
           memory: "120MB"
