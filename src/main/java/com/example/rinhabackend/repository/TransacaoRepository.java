@@ -14,13 +14,13 @@ import static com.example.rinhabackend.enums.HttpStatus.UNPROCESSABLE_ENTITY;
 
 public class TransacaoRepository {
 
-    public TransacaoResponse atualizaSaldoERegistraTransacao(Long idCliente, Transacao transacao) {
+    public TransacaoResponse atualizaSaldoERegistraTransacao(int idCliente, Transacao transacao) {
         TransacaoResponse transacaoResponse = new TransacaoResponse();
         try (Connection connection = DatabaseConnection.getDataSource().getConnection()) {
             String procedureCall = "{call public.efetuar_transacao(?, ?, ?, ?)}";
             CallableStatement callableStatement = connection.prepareCall(procedureCall);
 
-            callableStatement.setInt(1, idCliente.intValue());
+            callableStatement.setInt(1, idCliente);
             callableStatement.setString(2, String.valueOf(transacao.getTipo()).toLowerCase());
             callableStatement.setInt(3, transacao.getValor());
             callableStatement.setString(4, transacao.getDescricao());

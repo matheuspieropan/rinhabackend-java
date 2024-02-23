@@ -4,7 +4,6 @@ import com.example.rinhabackend.dto.TransacaoRequest;
 import com.example.rinhabackend.dto.TransacaoResponse;
 import com.example.rinhabackend.enums.HttpStatus;
 import com.example.rinhabackend.exceptions.ValidacaoRequestException;
-import com.example.rinhabackend.repository.ExtratoRepository;
 import com.example.rinhabackend.service.ClienteService;
 import com.example.rinhabackend.service.ExtratoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,24 +30,14 @@ public class ClienteServlet extends HttpServlet {
     private final ClienteService clienteService = new ClienteService();
 
     public ClienteServlet() {
-        aquecimento();
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-    }
-
-    // isso pode? rs
-    private void aquecimento() {
-        long idCliente = 1L;
-        while (idCliente < 6) {
-            new ExtratoRepository().findAllById(idCliente);
-            idCliente++;
-        }
     }
 
     @Override
     protected synchronized void doGet(HttpServletRequest request, HttpServletResponse response) {
         try {
-            Long idCliente = obterIdCliente(request.getRequestURI());
+            int idCliente = obterIdCliente(request.getRequestURI());
 
             response.getWriter().write(objectMapper.writeValueAsString(extratoService.obterExtrato(idCliente)));
             response.setContentType("application/json");
@@ -63,9 +52,9 @@ public class ClienteServlet extends HttpServlet {
     @Override
     protected synchronized void doPost(HttpServletRequest request, HttpServletResponse response) {
         try {
-            Long idCliente = obterIdCliente(request.getRequestURI());
+            int idCliente = obterIdCliente(request.getRequestURI());
 
-            try (BufferedReader bufferedReader = new BufferedReader(request.getReader(), 1)) {
+            try (BufferedReader bufferedReader = new BufferedReader(request.getReader())) {
 
                 StringBuilder json = new StringBuilder();
                 String line;
@@ -88,14 +77,14 @@ public class ClienteServlet extends HttpServlet {
         }
     }
 
-    private Long obterIdCliente(String requestURI) {
-        Long idCliente = Long.valueOf(requestURI.split("/")[2]);
+    private int obterIdCliente(String requestURI) {
+        int idCliente = Integer.valueOf(requestURI.split("/")[2]);
         validarCliente(idCliente);
 
         return idCliente;
     }
 
-    public void validarCliente(Long idCliente) {
+    public void validarCliente(int idCliente) {
         if (idCliente < 1 || idCliente > 5) {
             throw new ValidacaoRequestException(HttpStatus.NOT_FOUND.getCodigo(), "Usuário não encontrado.");
         }

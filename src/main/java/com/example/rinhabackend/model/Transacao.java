@@ -17,7 +17,7 @@ public class Transacao {
     private Timestamp realizadaEm;
 
     @JsonIgnore
-    private Long idCliente;
+    private int idCliente;
 
     public int getValor() {
         return valor;
@@ -47,7 +47,7 @@ public class Transacao {
         this.realizadaEm = realizadaEm;
     }
 
-    public Transacao(int valor, char tipo, String descricao, Long idCliente) {
+    public Transacao(int valor, char tipo, String descricao, int idCliente) {
         this.valor = valor;
         this.tipo = tipo;
         this.descricao = descricao;
