@@ -35,7 +35,7 @@ public class ClienteServlet extends HttpServlet {
     }
 
     @Override
-    protected synchronized void doGet(HttpServletRequest request, HttpServletResponse response) {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) {
         try {
             int idCliente = obterIdCliente(request.getRequestURI());
 
@@ -50,7 +50,7 @@ public class ClienteServlet extends HttpServlet {
     }
 
     @Override
-    protected synchronized void doPost(HttpServletRequest request, HttpServletResponse response) {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) {
         try {
             int idCliente = obterIdCliente(request.getRequestURI());
 
