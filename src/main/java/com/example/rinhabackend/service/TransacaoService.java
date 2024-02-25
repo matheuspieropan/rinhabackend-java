@@ -2,7 +2,6 @@ package com.example.rinhabackend.service;
 
 import com.example.rinhabackend.dto.TransacaoRequest;
 import com.example.rinhabackend.dto.TransacaoResponse;
-import com.example.rinhabackend.model.Transacao;
 import com.example.rinhabackend.repository.TransacaoRepository;
 import com.example.rinhabackend.service.strategy.ValidacaoTransacaoRequest;
 import com.example.rinhabackend.service.strategy.impl.DescricaoCaracterMinMaxRequest;
@@ -12,7 +11,7 @@ import com.example.rinhabackend.service.strategy.impl.ValorPositivoRequest;
 import java.util.Arrays;
 import java.util.List;
 
-public class ClienteService {
+public class TransacaoService {
 
     private final TransacaoRepository transacaoRepository = new TransacaoRepository();
 
@@ -31,8 +30,6 @@ public class ClienteService {
     }
 
     private TransacaoResponse realizarTransacao(TransacaoRequest transacaoRequest, int idCliente) {
-        Transacao transacao = new Transacao(Integer.parseInt(transacaoRequest.getValor()), transacaoRequest.getTipo(), transacaoRequest.getDescricao(), idCliente);
-
-        return transacaoRepository.atualizaSaldoERegistraTransacao(idCliente, transacao);
+        return transacaoRepository.realizarTransacao(idCliente, transacaoRequest.getTipo(), Integer.parseInt(transacaoRequest.getValor()), transacaoRequest.getDescricao());
     }
 }

@@ -4,7 +4,7 @@ import com.example.rinhabackend.dto.TransacaoRequest;
 import com.example.rinhabackend.dto.TransacaoResponse;
 import com.example.rinhabackend.enums.HttpStatus;
 import com.example.rinhabackend.exceptions.ValidacaoRequestException;
-import com.example.rinhabackend.service.ClienteService;
+import com.example.rinhabackend.service.TransacaoService;
 import com.example.rinhabackend.service.ExtratoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -27,7 +27,7 @@ public class ClienteServlet extends HttpServlet {
 
     private final ExtratoService extratoService = new ExtratoService();
 
-    private final ClienteService clienteService = new ClienteService();
+    private final TransacaoService transacaoService = new TransacaoService();
 
     public ClienteServlet() {
         objectMapper.registerModule(new JavaTimeModule());
@@ -64,7 +64,7 @@ public class ClienteServlet extends HttpServlet {
                 }
 
                 TransacaoRequest transacaoRequest = objectMapper.readValue(json.toString(), TransacaoRequest.class);
-                TransacaoResponse transacaoResponse = clienteService.transacao(idCliente, transacaoRequest);
+                TransacaoResponse transacaoResponse = transacaoService.transacao(idCliente, transacaoRequest);
 
                 response.setStatus(SC_OK);
                 response.getWriter().write(objectMapper.writeValueAsString(transacaoResponse));
