@@ -15,8 +15,6 @@
         <maven.compiler.target>11</maven.compiler.target>
         <maven.compiler.source>11</maven.compiler.source>
         <junit.version>5.9.2</junit.version>
-        <scala-maven-plugin.version>4.8.1</scala-maven-plugin.version>
-        <gatling-maven-plugin.version>4.8.2</gatling-maven-plugin.version>
     </properties>
 
     <dependencies>
@@ -85,31 +83,12 @@
                     <plugin>
                         <groupId>net.alchim31.maven</groupId>
                         <artifactId>scala-maven-plugin</artifactId>
-                        <version>${scala-maven-plugin.version}</version>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>testCompile</goal>
-                                </goals>
-                                <configuration>
-                                    <jvmArgs>
-                                        <jvmArg>-Xss100M</jvmArg>
-                                    </jvmArgs>
-                                    <args>
-                                        <arg>-deprecation</arg>
-                                        <arg>-feature</arg>
-                                        <arg>-unchecked</arg>
-                                        <arg>-language:implicitConversions</arg>
-                                        <arg>-language:postfixOps</arg>
-                                    </args>
-                                </configuration>
-                            </execution>
-                        </executions>
+                        <version>4.8.1</version>
                     </plugin>
                     <plugin>
                         <groupId>io.gatling</groupId>
                         <artifactId>gatling-maven-plugin</artifactId>
-                        <version>${gatling-maven-plugin.version}</version>
+                        <version>4.8.2</version>
                     </plugin>
                 </plugins>
             </build>
