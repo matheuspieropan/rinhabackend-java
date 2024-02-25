@@ -2,6 +2,7 @@ package com.example.rinhabackend.repository;
 
 import com.example.rinhabackend.conexao.DatabaseConnection;
 import com.example.rinhabackend.dto.TransacaoResponse;
+import com.example.rinhabackend.exceptions.ValidacaoRequestException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -11,12 +12,11 @@ import java.sql.SQLException;
 public class TransacaoRepository {
 
     public TransacaoResponse realizarTransacao(int idCliente, char operacao, int valorOperacao, String descricao) {
-        TransacaoResponse transacaoResponse = new TransacaoResponse();
         try (Connection connection = DatabaseConnection.getDataSource().getConnection()) {
 
             connection.setAutoCommit(false);
 
-            String obterSaldo = "SELECT saldo, limite FROM cliente WHERE id = ?";
+            String obterSaldo = "SELECT saldo, limite FROM cliente WHERE id = ? FOR UPDATE;";
 
             PreparedStatement stmSelect = connection.prepareStatement(obterSaldo);
             stmSelect.setInt(1, idCliente);
@@ -26,7 +26,7 @@ public class TransacaoRepository {
 
                 int saldo = resultSet.getInt("saldo");
                 int limite = resultSet.getInt("limite");
-                boolean possoRealizarOperacao = operacao != 'd' || (saldo - valorOperacao) <= limite;
+                boolean possoRealizarOperacao = operacao != 'd' || Math.abs(saldo - valorOperacao) <= limite;
 
                 if (possoRealizarOperacao) {
 
@@ -49,14 +49,16 @@ public class TransacaoRepository {
 
                         stmInsert.executeUpdate();
                         connection.commit();
-                        transacaoResponse.setLimite(limite);
-                        transacaoResponse.setSaldo(novoSaldo);
+
+                        return new TransacaoResponse(limite, novoSaldo);
                     }
+                } else {
+                    throw new ValidacaoRequestException(422, "Não pode realizar transação!");
                 }
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
-        return transacaoResponse;
+        return null;
     }
 }
