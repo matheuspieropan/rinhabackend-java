@@ -64,7 +64,7 @@ public class ClienteServlet extends HttpServlet {
                 }
 
                 TransacaoRequest transacaoRequest = objectMapper.readValue(json.toString(), TransacaoRequest.class);
-                TransacaoResponse transacaoResponse = transacaoService.transacao(idCliente, transacaoRequest);
+                TransacaoResponse transacaoResponse = transacaoService.realizarTransacao(idCliente, transacaoRequest);
 
                 response.setStatus(SC_OK);
                 response.getWriter().write(objectMapper.writeValueAsString(transacaoResponse));

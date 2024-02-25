@@ -20,16 +20,12 @@ public class TransacaoService {
             new TipoValidoRequest(),
             new DescricaoCaracterMinMaxRequest());
 
-    public TransacaoResponse transacao(int idCliente, TransacaoRequest transacaoRequest) {
+    public TransacaoResponse realizarTransacao(int idCliente, TransacaoRequest transacaoRequest) {
         validarDadosRequisicao(transacaoRequest);
-        return realizarTransacao(transacaoRequest, idCliente);
+        return transacaoRepository.realizarTransacao(idCliente, transacaoRequest.getTipo(), Integer.parseInt(transacaoRequest.getValor()), transacaoRequest.getDescricao());
     }
 
     private void validarDadosRequisicao(TransacaoRequest transacaoRequest) {
         validacoesDadosRequisicao.forEach(impl -> impl.validar(transacaoRequest));
-    }
-
-    private TransacaoResponse realizarTransacao(TransacaoRequest transacaoRequest, int idCliente) {
-        return transacaoRepository.realizarTransacao(idCliente, transacaoRequest.getTipo(), Integer.parseInt(transacaoRequest.getValor()), transacaoRequest.getDescricao());
     }
 }
