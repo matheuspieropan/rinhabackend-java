@@ -62,8 +62,8 @@ public class ExtratoResponse {
         public String toJSON() {
             return "{" +
                     "\"total\":" + total + "," +
-                    "\"data_extrato\":\"" + data + "\"," +
-                    "\"limite\":" + limite +
+                    "\"limite\":" + limite + "," +
+                    "\"data_extrato\":" + data +
                     "}";
         }
     }

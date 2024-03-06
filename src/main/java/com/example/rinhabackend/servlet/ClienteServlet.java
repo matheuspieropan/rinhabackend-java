@@ -72,8 +72,7 @@ public class ClienteServlet extends HttpServlet {
 
                 String jsonResponse = "{" +
                         "\"limite\":" + transacaoResponse.getLimite() + "," +
-                        "\"saldo\":" + transacaoResponse.getSaldo() + "," +
-                        "}";
+                        "\"saldo\":" + transacaoResponse.getSaldo() + "}";
 
                 response.setStatus(SC_OK);
                 response.getWriter().write(jsonResponse);
