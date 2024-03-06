@@ -1,14 +1,13 @@
 package com.example.rinhabackend.servlet;
 
+import com.example.rinhabackend.dto.ExtratoResponse;
 import com.example.rinhabackend.dto.TransacaoRequest;
 import com.example.rinhabackend.dto.TransacaoResponse;
 import com.example.rinhabackend.enums.HttpStatus;
 import com.example.rinhabackend.exceptions.ValidacaoRequestException;
+import com.example.rinhabackend.model.Transacao;
 import com.example.rinhabackend.service.ClienteService;
 import com.example.rinhabackend.service.ExtratoService;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,6 +15,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.stream.Collectors;
 
 import static jakarta.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static jakarta.servlet.http.HttpServletResponse.SC_OK;
@@ -23,23 +23,24 @@ import static jakarta.servlet.http.HttpServletResponse.SC_OK;
 @WebServlet("/clientes/*")
 public class ClienteServlet extends HttpServlet {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
     private final ExtratoService extratoService = new ExtratoService();
 
     private final ClienteService clienteService = new ClienteService();
-
-    public ClienteServlet() {
-        objectMapper.registerModule(new JavaTimeModule());
-        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
         try {
             int idCliente = obterIdCliente(request.getRequestURI());
 
-            response.getWriter().write(objectMapper.writeValueAsString(extratoService.obterExtrato(idCliente)));
+            ExtratoResponse extratoResponse = extratoService.obterExtrato(idCliente);
+            String saldo = "\"saldo\":" + extratoResponse.getSaldo().toJSON();
+            String ultimasTransacoes = "\"ultimas_transacoes\":[" +
+                    extratoResponse.getTransacoes().stream()
+                            .map(Transacao::toJSON)
+                            .collect(Collectors.joining(",")) +
+                    "]";
+
+            response.getWriter().write("{" + saldo + "," + ultimasTransacoes + "}");
             response.setContentType("application/json");
 
         } catch (ValidacaoRequestException ex) {
@@ -63,11 +64,19 @@ public class ClienteServlet extends HttpServlet {
                     json.append(line);
                 }
 
-                TransacaoRequest transacaoRequest = objectMapper.readValue(json.toString(), TransacaoRequest.class);
+                String novoJson = json.toString().replaceAll("\\s+", "");
+                String[] keyValuePairs = novoJson.substring(1, novoJson.length() - 1).split(",");
+
+                TransacaoRequest transacaoRequest = arrayToTransacaoRequest(keyValuePairs);
                 TransacaoResponse transacaoResponse = clienteService.transacao(idCliente, transacaoRequest);
 
+                String jsonResponse = "{" +
+                        "\"limite\":" + transacaoResponse.getLimite() + "," +
+                        "\"saldo\":" + transacaoResponse.getSaldo() + "," +
+                        "}";
+
                 response.setStatus(SC_OK);
-                response.getWriter().write(objectMapper.writeValueAsString(transacaoResponse));
+                response.getWriter().write(jsonResponse);
                 response.setContentType("application/json");
             }
         } catch (ValidacaoRequestException ex) {
@@ -78,7 +87,7 @@ public class ClienteServlet extends HttpServlet {
     }
 
     private int obterIdCliente(String requestURI) {
-        int idCliente = Integer.valueOf(requestURI.split("/")[2]);
+        int idCliente = Integer.parseInt(requestURI.split("/")[2]);
         validarCliente(idCliente);
 
         return idCliente;
@@ -88,5 +97,19 @@ public class ClienteServlet extends HttpServlet {
         if (idCliente < 1 || idCliente > 5) {
             throw new ValidacaoRequestException(HttpStatus.NOT_FOUND.getCodigo(), "Usuário não encontrado.");
         }
+    }
+
+    private TransacaoRequest arrayToTransacaoRequest(String[] par) {
+        TransacaoRequest transacaoRequest = new TransacaoRequest();
+
+        String valor = par[0].replaceAll("\"", "").split(":")[1];
+        Character tipo = par[1].replaceAll("\"", "").split(":")[1].toCharArray()[0];
+        String descricao = par[2].replaceAll("\"", "").split(":")[1];
+
+        transacaoRequest.setValor(valor);
+        transacaoRequest.setTipo(tipo);
+        transacaoRequest.setDescricao(descricao);
+
+        return transacaoRequest;
     }
 }

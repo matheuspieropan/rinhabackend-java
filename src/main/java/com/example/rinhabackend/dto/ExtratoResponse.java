@@ -1,7 +1,6 @@
 package com.example.rinhabackend.dto;
 
 import com.example.rinhabackend.model.Transacao;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -10,7 +9,6 @@ public class ExtratoResponse {
 
     private Saldo saldo;
 
-    @JsonProperty("ultimas_transacoes")
     private List<Transacao> transacoes;
 
     public void setSaldo(Saldo saldo) {
@@ -33,7 +31,6 @@ public class ExtratoResponse {
 
         private int total;
 
-        @JsonProperty("data_extrato")
         private LocalDateTime data;
 
         private int limite;
@@ -60,6 +57,14 @@ public class ExtratoResponse {
 
         public int getLimite() {
             return limite;
+        }
+
+        public String toJSON() {
+            return "{" +
+                    "\"total\":" + total + "," +
+                    "\"data_extrato\":\"" + data + "\"," +
+                    "\"limite\":" + limite +
+                    "}";
         }
     }
 }

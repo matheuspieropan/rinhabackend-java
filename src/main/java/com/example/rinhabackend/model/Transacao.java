@@ -1,8 +1,5 @@
 package com.example.rinhabackend.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.sql.Timestamp;
 
 public class Transacao {
@@ -13,10 +10,8 @@ public class Transacao {
 
     private String descricao;
 
-    @JsonProperty("realizada_em")
     private Timestamp realizadaEm;
 
-    @JsonIgnore
     private int idCliente;
 
     public int getValor() {
@@ -55,5 +50,14 @@ public class Transacao {
     }
 
     public Transacao() {
+    }
+
+    public String toJSON() {
+        return "{" +
+                "\"valor\":" + valor + "," +
+                "\"tipo\":\"" + tipo + "\"," +
+                "\"descricao\":\"" + descricao + "\"," +
+                "\"realizada_em\":\"" + realizadaEm + "\"" +
+                "}";
     }
 }
