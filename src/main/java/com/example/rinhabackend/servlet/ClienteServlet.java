@@ -103,8 +103,16 @@ public class ClienteServlet extends HttpServlet {
 
         String valor = par[0].replaceAll("\"", "").split(":")[1];
         Character tipo = par[1].replaceAll("\"", "").split(":")[1].toCharArray()[0];
-        String descricao = par[2].replaceAll("\"", "").split(":")[1];
 
+        String descricao = null;
+        boolean possuiDescricao = par[2].replaceAll("\"", "").split(":").length > 1;
+
+        if (possuiDescricao) {
+            String descricaoEncontrada = par[2].replaceAll("\"", "").split(":")[1];
+            if (!descricaoEncontrada.equalsIgnoreCase("NULL")) {
+                descricao = par[2].replaceAll("\"", "").split(":")[1];
+            }
+        }
         transacaoRequest.setValor(valor);
         transacaoRequest.setTipo(tipo);
         transacaoRequest.setDescricao(descricao);
