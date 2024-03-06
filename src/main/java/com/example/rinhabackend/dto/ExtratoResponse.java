@@ -63,7 +63,7 @@ public class ExtratoResponse {
             return "{" +
                     "\"total\":" + total + "," +
                     "\"limite\":" + limite + "," +
-                    "\"data_extrato\":" + data +
+                    "\"data_extrato\":" + "\"" + data + "\"" +
                     "}";
         }
     }
