@@ -65,9 +65,9 @@ public class ClienteServlet extends HttpServlet {
                 }
 
                 String novoJson = json.toString().replaceAll("\\s+", "");
-                String[] keyValuePairs = novoJson.substring(1, novoJson.length() - 1).split(",");
+                String[] parChaveValor = novoJson.substring(1, novoJson.length() - 1).split(",");
 
-                TransacaoRequest transacaoRequest = arrayToTransacaoRequest(keyValuePairs);
+                TransacaoRequest transacaoRequest = arrayToTransacaoRequest(parChaveValor);
                 TransacaoResponse transacaoResponse = clienteService.transacao(idCliente, transacaoRequest);
 
                 String jsonResponse = "{" +
@@ -101,16 +101,16 @@ public class ClienteServlet extends HttpServlet {
     private TransacaoRequest arrayToTransacaoRequest(String[] par) {
         TransacaoRequest transacaoRequest = new TransacaoRequest();
 
-        String valor = par[0].replaceAll("\"", "").split(":")[1];
-        Character tipo = par[1].replaceAll("\"", "").split(":")[1].toCharArray()[0];
+        String valor = par[0].split(":")[1];
+        Character tipo = par[1].split(":")[1].toCharArray()[1];
 
         String descricao = null;
-        boolean possuiDescricao = par[2].replaceAll("\"", "").split(":").length > 1;
+        boolean possuiDescricao = par[2].split(":").length > 1;
 
         if (possuiDescricao) {
-            String descricaoEncontrada = par[2].replaceAll("\"", "").split(":")[1];
-            if (!descricaoEncontrada.equalsIgnoreCase("NULL")) {
-                descricao = par[2].replaceAll("\"", "").split(":")[1];
+            String descricaoEncontrada = par[2].split(":")[1].replaceAll("\"","");
+            if (!descricaoEncontrada.equalsIgnoreCase("null")) {
+                descricao = descricaoEncontrada;
             }
         }
         transacaoRequest.setValor(valor);
