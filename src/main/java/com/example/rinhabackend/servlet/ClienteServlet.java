@@ -15,6 +15,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.stream.Collectors;
 
 import static jakarta.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
@@ -27,12 +28,24 @@ public class ClienteServlet extends HttpServlet {
 
     private final ClienteService clienteService = new ClienteService();
 
+    private final HashMap<Integer, Integer> limites = new HashMap<>();
+
+    {
+        limites.put(1, 100000);
+        limites.put(2, 80000);
+        limites.put(3, 1000000);
+        limites.put(4, 10000000);
+        limites.put(5, 500000);
+    }
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
         try {
             int idCliente = obterIdCliente(request.getRequestURI());
 
-            ExtratoResponse extratoResponse = extratoService.obterExtrato(idCliente);
+            int limite = limites.get(idCliente);
+            ExtratoResponse extratoResponse = extratoService.obterExtrato(idCliente, limite);
+
             String saldo = "\"saldo\":" + extratoResponse.getSaldo().toJSON();
             String ultimasTransacoes = "\"ultimas_transacoes\":[" +
                     extratoResponse.getTransacoes().stream()
@@ -68,7 +81,10 @@ public class ClienteServlet extends HttpServlet {
                 String[] parChaveValor = novoJson.substring(1, novoJson.length() - 1).split(",");
 
                 TransacaoRequest transacaoRequest = arrayToTransacaoRequest(parChaveValor);
-                TransacaoResponse transacaoResponse = clienteService.transacao(idCliente, transacaoRequest);
+
+                Integer limite = limites.get(idCliente);
+                TransacaoResponse transacaoResponse = clienteService.transacao(idCliente, transacaoRequest, limites.get(idCliente));
+                transacaoResponse.setLimite(limite);
 
                 String jsonResponse = "{" +
                         "\"limite\":" + transacaoResponse.getLimite() + "," +
@@ -108,7 +124,7 @@ public class ClienteServlet extends HttpServlet {
         boolean possuiDescricao = par[2].split(":").length > 1;
 
         if (possuiDescricao) {
-            String descricaoEncontrada = par[2].split(":")[1].replaceAll("\"","");
+            String descricaoEncontrada = par[2].split(":")[1].replaceAll("\"", "");
             if (!descricaoEncontrada.equalsIgnoreCase("null")) {
                 descricao = descricaoEncontrada;
             }

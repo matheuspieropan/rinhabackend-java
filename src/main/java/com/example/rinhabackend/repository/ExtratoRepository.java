@@ -16,7 +16,8 @@ import java.util.Objects;
 
 public class ExtratoRepository {
 
-    public ExtratoResponse findAllById(int idCliente) {
+    public ExtratoResponse findAllById(int idCliente,
+                                       int limite) {
         PreparedStatement prepareStatement;
 
         ExtratoResponse extratoResponse = new ExtratoResponse();
@@ -25,7 +26,7 @@ public class ExtratoRepository {
 
         try (Connection connection = DatabaseConnection.getDataSource().getConnection()) {
 
-            prepareStatement = connection.prepareStatement("SELECT c.saldo, c.limite, t.valor, t.tipo, t.descricao, t.realizada_em from cliente c left join transacao t " +
+            prepareStatement = connection.prepareStatement("SELECT c.saldo, t.valor, t.tipo, t.descricao, t.realizada_em from cliente c left join transacao t " +
                     "ON t.id_cliente = c.id WHERE c.id = ? order by t.realizada_em DESC limit 10");
             prepareStatement.setInt(1, idCliente);
 
@@ -39,7 +40,7 @@ public class ExtratoRepository {
 
                         saldo.setTotal(rs.getInt("saldo"));
                         saldo.setData(LocalDateTime.now());
-                        saldo.setLimite(rs.getInt("limite"));
+                        saldo.setLimite(limite);
                         extratoResponse.setSaldo(saldo);
                         extratoResponseNaoPreenchido = false;
                     }

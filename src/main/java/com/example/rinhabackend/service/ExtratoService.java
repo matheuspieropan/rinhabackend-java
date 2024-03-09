@@ -7,7 +7,7 @@ public class ExtratoService {
 
     private final ExtratoRepository extratoRepository = new ExtratoRepository();
 
-    public ExtratoResponse obterExtrato(int idCliente) {
-        return extratoRepository.findAllById(idCliente);
+    public ExtratoResponse obterExtrato(int idCliente, int limite) {
+        return extratoRepository.findAllById(idCliente, limite);
     }
 }

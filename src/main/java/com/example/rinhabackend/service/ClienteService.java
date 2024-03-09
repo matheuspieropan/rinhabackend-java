@@ -21,18 +21,24 @@ public class ClienteService {
             new TipoValidoRequest(),
             new DescricaoCaracterMinMaxRequest());
 
-    public TransacaoResponse transacao(int idCliente, TransacaoRequest transacaoRequest) {
+    public TransacaoResponse transacao(int idCliente,
+                                       TransacaoRequest transacaoRequest,
+                                       int limite) {
         validarDadosRequisicao(transacaoRequest);
-        return realizarTransacao(transacaoRequest, idCliente);
+        return realizarTransacao(transacaoRequest, idCliente, limite);
     }
 
     private void validarDadosRequisicao(TransacaoRequest transacaoRequest) {
         validacoesDadosRequisicao.forEach(impl -> impl.validar(transacaoRequest));
     }
 
-    private TransacaoResponse realizarTransacao(TransacaoRequest transacaoRequest, int idCliente) {
-        Transacao transacao = new Transacao(Integer.parseInt(transacaoRequest.getValor()), transacaoRequest.getTipo(), transacaoRequest.getDescricao(), idCliente);
+    private TransacaoResponse realizarTransacao(TransacaoRequest transacaoRequest,
+                                                int idCliente,
+                                                int limite) {
+        Transacao transacao = new Transacao(Integer.parseInt(transacaoRequest.getValor()),
+                transacaoRequest.getTipo(),
+                transacaoRequest.getDescricao(), idCliente);
 
-        return transacaoRepository.atualizaSaldoERegistraTransacao(idCliente, transacao);
+        return transacaoRepository.atualizaSaldoERegistraTransacao(idCliente, transacao, limite);
     }
 }
