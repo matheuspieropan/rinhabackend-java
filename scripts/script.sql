@@ -26,48 +26,30 @@ CREATE INDEX idx_transacao_id_cliente ON transacao (id_cliente);
 CREATE INDEX idx_transacao_id_cliente_realizada_em ON transacao (id_cliente, realizada_em DESC);
 
 
-CREATE OR REPLACE FUNCTION efetuar_transacao(
-clienteIdParam int,
-tipoParam varchar(1),
-valorParam int,
-descricaoParam varchar(10)
+CREATE OR REPLACE FUNCTION efetuar_transacao2(
+    clienteId int,
+    tipoParam varchar(1),
+    valorParam int,
+    descricaoParam varchar(10)
 )
-RETURNS TABLE (saldoRetorno int, limiteRetorno int) AS $$
+RETURNS TABLE(limiteRetorno int, saldoRetorno int) AS
+$$
 DECLARE
-cliente cliente%rowtype;
-novoSaldo
-int;
-numeroLinhasAfetadas
-int;
+novoSaldo int;
 BEGIN
-PERFORM
-* FROM cliente where id = clienteIdParam FOR
-UPDATE;
-IF
-tipoParam = 'd' THEN
-novoSaldo := valorParam * -1;
+    IF tipoParam = 'd' THEN
+        novoSaldo := valorParam * -1;
 ELSE
-novoSaldo := valorParam;
+        novoSaldo := valorParam;
 END IF;
 
-UPDATE cliente
-SET saldo = saldo + novoSaldo
-WHERE id = clienteIdParam
-  AND (novoSaldo > 0 OR limite * -1 <= saldo + novoSaldo) RETURNING *
-INTO cliente;
-
-GET DIAGNOSTICS numeroLinhasAfetadas = ROW_COUNT;
-
-IF
-numeroLinhasAfetadas = 0 THEN
-RAISE EXCEPTION 'Cliente nao possui limite';
-END IF;
+UPDATE cliente SET saldo = saldo + novoSaldo WHERE id = clienteId
+    RETURNING limite, saldo INTO limiteRetorno, saldoRetorno;
 
 INSERT INTO transacao (id_cliente, valor, tipo, descricao, realizada_em)
-VALUES (clienteIdParam, valorParam, tipoParam, descricaoParam, current_timestamp);
+VALUES (clienteId, valorParam, tipoParam, descricaoParam, current_timestamp);
 
-
-RETURN QUERY SELECT cliente.saldo, cliente.limite;
+RETURN QUERY SELECT limiteRetorno, saldoRetorno;
 END;
 $$
 LANGUAGE plpgsql;
